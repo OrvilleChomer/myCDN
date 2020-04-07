@@ -1,0 +1,4 @@
+/*
+  Some very generic utility functions
+  
+ */
