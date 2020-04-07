@@ -1,0 +1,5 @@
+/*
+  An object property browser UI
+  
+  Usually added to a panel component.
+ */
