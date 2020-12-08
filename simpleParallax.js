@@ -19,15 +19,21 @@
 
 
 function SimpleParallax(params) {
+  console.log("SimpleParallax() Constructor called")
   const simpleParallax = this
   let MAX_MOVEMENT = getVal(params,"maxMovement",80);
   const EDGE_THICKNESS = Math.floor(MAX_MOVEMENT / 2);
+  const MOVEMENT_DAMPER_VALUE_X = 0.2;
+  const MOVEMENT_DAMPER_VALUE_Y = 0.3;
+  
   
   let layersByIndex = [];
     
   let nPivotLayer = -1;
+  let bResizingLayers = false;
+  let bNeedToResizeAgain = false;
   
-  
+
   
   simpleParallax.addLayer = function(nInpZindex) {
     try {
@@ -66,16 +72,19 @@ function SimpleParallax(params) {
   } // end of simpleParalax.addLayer()
   
   
-  function domContentLoaded(evt) {
-    try {
+  function pageLoaded(evt) {
+    console.log("pageLoaded() called")
+    try {      
       window.addEventListener("resize", resizeLayers)
       document.addEventListener("mousemove", handleMouseMovement);
-      //document.addEventListener("mouseout", resetParallaxEffect);
+      document.addEventListener("mouseout", resetParallaxEffect);     
+      
     } catch(err) {
+      debugger
       logErr(err)
     } // end of try/catch
     
-  } // end of domContentLoaded()
+  } // end of pageLoaded()
   
   
   function resetParallaxEffect() {
@@ -93,6 +102,7 @@ function SimpleParallax(params) {
     
   } // end if resetParallaxEffect
   
+  
   function resizeLayer(layer) {
     try {
       const w = window.innerWidth;
@@ -103,6 +113,8 @@ function SimpleParallax(params) {
       
     } catch(err) {
       logErr(err)
+      bResizingLayers = false;
+      bNeedToResizeAgain = false;
     } // end if try/catch
     
     
@@ -112,6 +124,13 @@ function SimpleParallax(params) {
   
   function resizeLayers(evt) {
     try {
+      
+      if (bResizingLayers=== true) {
+        
+        return;
+      } // end if
+      
+      bResizingLayers = true;
       const nMax = layersByIndex.length;
       
       for (let n=0;n<nMax;n++) {
@@ -119,22 +138,33 @@ function SimpleParallax(params) {
         resizeLayer(layer);
       } // next n
       
+      bResizingLayers = false;
+      
+      if (bNeedToResizeAgain===true) {
+        bNeedToResizeAgain = false;
+        resizeLayers(evt)
+      } // end if
+      
+      bNeedToResizeAgain = false;
     } catch(err) {
       logErr(err)
+      bResizingLayers = false;
+      bNeedToResizeAgain = false;
     } // end of try/catch block
     
   } // end of resizeLayers()
   
   
   function handleMouseMovement(evt) {
+    
     try {
       const el = evt.srcElement || evt.originalTarget;
       const x = evt.pageX;
       const y = evt.pageY;
-
+      
       doParallaxEffect(x, y)
     } catch(err) {
-      
+      logErr(err)
     } // end try/catch
     
     
@@ -145,14 +175,14 @@ function SimpleParallax(params) {
    */
   function doParallaxEffect(x, y) {
     try {      
-      if (layersByIndex.length <2) {
+      if (layersByIndex.length <3) {
         return; // not enough layers to do a parallax effect
       } // end if
       
       const w = window.innerWidth;
       const h = window.innerHeight;
-      let xPct = EDGE_THICKNESS / w;
-      let yPct = EDGE_THICKNESS / h;
+      let xPct = EDGE_THICKNESS / w - MOVEMENT_DAMPER_VALUE_X;
+      let yPct = EDGE_THICKNESS / h - MOVEMENT_DAMPER_VALUE_Y;
       
       let nMaxXOffset = x * xPct;
       let nMaxYOffset = y * yPct;
@@ -171,21 +201,26 @@ function SimpleParallax(params) {
         let nLayerDiff = pivotLayer.zIndex -layer.zIndex;
         
         let x2,y2;
-        
-        if (x>Math.floor(w/2)) {
-          x2 = (nMaxXOffset - nLayerDiff) * -1
-        } else {
-          x2 = nMaxXOffset - nLayerDiff
-        } // end if/else
-        
-        if (y>Math.floor(h/2)) {
-          y = (nMaxYOffset - nLayerDiff) * -1
-        } else {
-          y2 = nMaxYOffset - nLayerDiff
-        } // end if/else
+                
+        x2 = nMaxXOffset - nLayerDiff;
+        y2 = nMaxYOffset - nLayerDiff;
         
         x2 = Math.floor(x2)
         y2 = Math.floor(y2)
+        
+        layerNd.style.transform = "translate("+x2+"px,"+y2+"px)"
+      } // next n
+      
+      // handle layers in Front of the pivot layer:
+      for (let n=nPivotLayer+1;n<layersByIndex.length;n++) {
+        const layer = layersByIndex[n];
+        const layerNd = layer.domNode
+        
+        let nLayerDiff = pivotLayer.zIndex + layer.zIndex;
+        
+        let x2,y2;
+        x2 = (nMaxXOffset - nLayerDiff) * -1
+        y2 = (nMaxYOffset - nLayerDiff) * -1
         
         layerNd.style.transform = "translate("+x2+"px,"+y2+"px)"
       } // next n
@@ -224,8 +259,6 @@ function SimpleParallax(params) {
     } // end of logErr()
   
   
-  window.addEventListener('DOMContentLoaded', domContentLoaded);
-  
+  window.addEventListener('load', pageLoaded);
+  console.log("'load' event listener set")
 } // end of SimpleParallax() Constructor
-
-
