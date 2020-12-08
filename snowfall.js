@@ -19,7 +19,7 @@
  ***************************************************************************/
 let simpleParallax;
 
-function Snowfall() {
+function Snowfall(params) {
   const snowfall = this;
   let CANVAS_WIDTH = 600;
   let CANVAS_HEIGHT = 400;
@@ -30,6 +30,11 @@ function Snowfall() {
   let snowfallLayersByIndex = [];
   let snowfallLayersByCanvasId = [];
   let bSimpleParallaxLibLoaded = false;
+  let coreSnowflakeStylesNd;
+  let skyNd = getVal(params,"skyNode",document.body)
+  
+  const moonlitEvening = {skyColor1:"#2B3C46",skyColor2:"#3363A1",
+                          flakeColors:["#61899e","#61899e"]}
   
   try {
     window.addEventListener('DOMContentLoaded', domContentLoaded);
@@ -39,10 +44,73 @@ function Snowfall() {
       try {
         CANVAS_WIDTH = screen.width + (BLOW_DISTANCE * 2);
         CANVAS_HEIGHT = screen.height+100;
+        let bSkyStyleBuilt = false;
+        let sSnowySkyClass = "snowySky"
         
         if (typeof SimpleParallax !== "undefined") {
           simpleParallax = new SimpleParallax({maxMovement:BLOW_DISTANCE * 2});
           bSimpleParallaxLibLoaded = true;
+        } // end if
+        
+        coreSnowflakeStylesNd = document.getElementById("coreSnowflakeStyles")
+        if (coreSnowflakeStylesNd===null || typeof coreSnowflakeStylesNd === "undefined") {
+          coreSnowflakeStylesNd = document.createElement('style');
+          coreSnowflakeStylesNd.id = "coreSnowflakeStyles";
+          let s=[];
+          
+          //s.push("")
+          //s.push("  ")
+          if (skyNd.style.background === "" && skyNd.style.backgroundImage === "") {
+            let dt = new Date()
+            let nCode = dt.getTime();
+            sSnowySkyClass = sSnowySkyClass + (nCode)+""
+
+            s.push("."+sSnowySkyClass+" {")
+            s.push("  height: 100%;")
+            s.push("  background-image: linear-gradient(#2B3C46, #3363A1);")
+            s.push("  padding:0px;")
+            s.push("  margin:0px;")
+            s.push("  overflow:hidden;")
+            s.push("  background-repeat: no-repeat;")
+            s.push("  background-attachment: fixed;")
+            s.push("}")
+            s.push("")
+            bSkyStyleBuilt = true;
+          } // end if
+          
+          
+          s.push(".snowFlakes {")
+          s.push("  position:absolute;")
+          s.push("  top:0px;")
+          s.push("  left:0px;")
+          s.push("  overflow:hidden;")
+          s.push("  opacity:.8;")
+          s.push("}")
+          s.push("")
+          
+          s.push(".iAmHidden {")
+          s.push("  display:none;")
+          s.push("}")
+          
+          if (!bSimpleParallaxLibLoaded) {
+            s.push("")
+            s.push(".snowLayer {")
+            s.push("  position:absolute;")
+            s.push("  left:-"+BLOW_DISTANCE+"px;")
+            s.push("  top:-"+BLOW_DISTANCE+"px;")
+            s.push("  overflow:hidden;")
+            s.push("}")
+          } // end if
+          
+          
+          
+          coreSnowflakeStylesNd.innerHTML = s.join("\n")
+          document.body.appendChild(coreSnowflakeStylesNd);
+          
+          if (bSkyStyleBuilt) {
+            skyNd.className = sSnowySkyClass;
+          } // end if
+          
         } // end if
         
         setupSnowFlakeLayers()
@@ -78,7 +146,7 @@ function Snowfall() {
           } else {
             // no parallax...
             dv = document.createElement('div');
-            dv.className = "layer"
+            dv.className = "snowLayer"
             dv.style.width = (CANVAS_WIDTH)+"px"
             dv.style.height = (CANVAS_HEIGHT)+"px"
             dv.style.margin = "0px";
@@ -322,6 +390,25 @@ function canvasAAnimationCompleted(evt) {
   } catch(err) {
     logErr(err)
   } // end of try/catch block for Snowfall
+  
+  
+  function getVal(params,sParam,defVal) {
+		if (!params) {
+			params = {};
+		} // end if
+
+		if (params[sParam]) {
+			return params[sParam];
+		} else {
+            if (typeof params[sParam] === "boolean") {
+                return params[sParam];
+            } // end if
+
+			return defVal;
+		} // if / else
+
+  } // end of function getVal()
+  
   
   
   /*************************************************************************
