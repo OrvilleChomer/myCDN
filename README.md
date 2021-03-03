@@ -1,2 +1,2 @@
 # myCDN
-A place to have JS files to access.
+A place to have JS files, and other kinds of file to access from web pages.
