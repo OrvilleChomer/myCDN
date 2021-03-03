@@ -8,6 +8,13 @@
 
    
     *************************************************************************/     
+
+   
+/*************************************************************************
+ *  Constructor for Library
+ *  #library_constructor
+ *************************************************************************/ 
+function OrvProps(siContainerId) {    
     const sContainerId = siContainerId;
     const containerNd = document.getElementById(sContainerId)
     const props = this;
