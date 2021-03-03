@@ -2298,102 +2298,112 @@ function CreateProp(params) {
         const s=[];
         const Q = '"';
 
-        let refObj = propsObj
+        try {
+            let refObj = propsObj
 
-        if (typeof alternateObj !== "undefined") {
-            refObj = alternateObj;
-        } // end if
+            if (typeof alternateObj !== "undefined") {
+                refObj = alternateObj;
+            } // end if
+    
+            if (typeof additionalObj !== "undefined" && typeof refObj[sObjPropName] === "undefined") {
+                refObj = additionalObj
+            } // end if
+    
+            s.push("<li class='orvPropLi'  ")
+            s.push("id="+Q+propId("li")+Q+" ")
+            s.push(dataIdx())
+            s.push(">")
+    
+            s.push("<div class='orvProp' ")
+            s.push("id="+Q+propId("orvProp")+Q+" ")
+            s.push(dataIdx())
+            s.push(">")
+    
+            s.push("<div class='orvPropName' ")
+            s.push("id="+Q+propId("orvPropName")+Q+" ")
+            s.push(dataIdx())
+            s.push(">")
+    
+            if (bBold) {
+                s.push("<b>")
+            } // end if
+    
+            if (sPropName === "left") {
+               // debugger
+            }
+    
+    
+            s.push(sPropName)
+    
+            if (bBold) {
+                s.push("</b>")
+            } // end if
+    
+            s.push("</div>"); // orvPropName
+    
+            s.push("<div class='orvPropValue' ")
+            s.push("id="+Q+propId("orvPropValue")+Q+" ")
+            s.push(dataIdx())
+            s.push(">")
+    
+            if (typeof refObj[sObjPropName] === "undefined") {
+                // property not defined... so define it as a blank string
+                refObj[sObjPropName] = ""
+                s.push("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    
+            } // end if
+    
+            if (bBold) {
+                s.push("<b>")
+            } // end if
+    
+    
+            if (sDataType==="string" || sDataType==="int" || sDataType==="number" || sDataType==="cssUom") {
+                if (!Array.isArray(optionSet)) {
+                    s.push(refObj[sObjPropName])
+                } else {
+    
+                    s.push(getOptionSetCaption(refObj[sObjPropName]))
+    
+                } // if/else
+    
+            } // end if
+    
+            if (sDataType==="boolean" && typeof refObj[sObjPropName] === "boolean") {
+                const bVal = refObj[sObjPropName];
+    
+                if (bVal) {
+                    s.push("True")
+                } else {
+                    s.push("False")
+                } // end if/else
+    
+            } // end if
+    
+            if (sDataType==="color") {            
+                s.push(getColorValueMarkup())
+                
+            } // end if
+    
+            if (bBold) {
+                s.push("</b>")
+            } // end if
+    
+            s.push("</div>"); // orvPropValue
+    
+            s.push("</div>"); // orvProp
+    
+            s.push("</li>")
+            return s.join("");
+        } catch(err) {
+            console.log("Error Occurred in prop.markup():")
+            console.log(err.message)
+            console.log("line no: "+err.line)
+            console.log("sObjPropName = '"+sObjPropName+"'")
+            debugger
+        } // end of try/catch
 
-        if (typeof additionalObj !== "undefined" && typeof refObj[sObjPropName] === "undefined") {
-            refObj = additionalObj
-        } // end if
 
-        s.push("<li class='orvPropLi'  ")
-        s.push("id="+Q+propId("li")+Q+" ")
-        s.push(dataIdx())
-        s.push(">")
-
-        s.push("<div class='orvProp' ")
-        s.push("id="+Q+propId("orvProp")+Q+" ")
-        s.push(dataIdx())
-        s.push(">")
-
-        s.push("<div class='orvPropName' ")
-        s.push("id="+Q+propId("orvPropName")+Q+" ")
-        s.push(dataIdx())
-        s.push(">")
-
-        if (bBold) {
-            s.push("<b>")
-        } // end if
-
-        if (sPropName === "left") {
-           // debugger
-        }
-
-
-        s.push(sPropName)
-
-        if (bBold) {
-            s.push("</b>")
-        } // end if
-
-        s.push("</div>"); // orvPropName
-
-        s.push("<div class='orvPropValue' ")
-        s.push("id="+Q+propId("orvPropValue")+Q+" ")
-        s.push(dataIdx())
-        s.push(">")
-
-        if (typeof refObj[sObjPropName] === "undefined") {
-            // property not defined... so define it as a blank string
-            refObj[sObjPropName] = ""
-            s.push("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-
-        } // end if
-
-        if (bBold) {
-            s.push("<b>")
-        } // end if
-
-
-        if (sDataType==="string" || sDataType==="int" || sDataType==="number" || sDataType==="cssUom") {
-            if (!Array.isArray(optionSet)) {
-                s.push(refObj[sObjPropName])
-            } else {
-
-                s.push(getOptionSetCaption(refObj[sObjPropName]))
-
-            } // if/else
-
-        } // end if
-
-        if (sDataType==="boolean" && typeof refObj[sObjPropName] === "boolean") {
-            const bVal = refObj[sObjPropName];
-
-            if (bVal) {
-                s.push("True")
-            } else {
-                s.push("False")
-            } // end if/else
-
-        } // end if
-
-        if (sDataType==="color") {            
-            s.push(getColorValueMarkup())
-            
-        } // end if
-
-        if (bBold) {
-            s.push("</b>")
-        } // end if
-
-        s.push("</div>"); // orvPropValue
-
-        s.push("</div>"); // orvProp
-
-        s.push("</li>")
-        return s.join("");
     } // end of prop.markup() method
 
     
