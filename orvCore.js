@@ -1093,9 +1093,8 @@ function OrvCore(optParams) {
 
             } // end if (window.location.hostname=== 'cdpn.io')
         } catch(err) {
-            orvCore.displayErrMsg(err,{},function(err) {
-              debugger;
-            }) 
+            console.dir(err)
+            debugger
         } // end of try/catch
     } // end of getAnyCodePenInfo()
 
