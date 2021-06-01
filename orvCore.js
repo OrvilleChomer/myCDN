@@ -35,6 +35,7 @@
 // *** MAIN CONSTRUCTOR:
 function OrvCore(optParams) {
     const orvCore = this;
+    orvCore.completelyLoaded = false; // potentially, this library might not be completely loaded... yet!
     let nHighestZIndex = 999
     let orvCoreDomSpace
     const sOrvCoreLibClassName = "orvCoreJsLib"
@@ -52,15 +53,18 @@ function OrvCore(optParams) {
 
     let sLastPosCntrId = "";
     let lastPosCntr;
+
+    let objectSchemasByRecId = new Map()
     
     /*
        CALL SOME GENERAL INITIALIZATION/CHECKING ROUTINES...
-     */
-    getAnyCodePenInfo()
 
-    if (sCodePenId === "") {
-        getLocalAppName()
-    } // end if
+       (actually this is done near the Bottom of this file to account for slow loading)
+
+       see at the END of OrvCore()'s Constructor code...
+       +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     */
+    
     
 
     /*
@@ -161,9 +165,14 @@ function OrvCore(optParams) {
     
 
       orvCore.addSchema = function(inpSchema) {
-
+        return addSchema(inpSchema)
       } // end of orvCore.addSchema()
 
+
+      orvCore.createDataObj = function(params) {
+        return createDataObj(params)
+
+      } // end of orvCore.createDataObj()
 
 
    /**
@@ -507,6 +516,12 @@ function OrvCore(optParams) {
 
 
 
+    function addSchema(inpSchema) {
+
+    } // end of addSchema
+
+
+
    /**
     * 
     * #break_up_file_url
@@ -557,6 +572,36 @@ function OrvCore(optParams) {
         } // end of try/catch
         
     } // end of debugIconMarkup
+
+/**
+ * 
+ * see:   addSchema()
+ * 
+ */
+    function createDataObj(params) {
+        try {
+            const internalData = {}
+            const dataObj = new Proxy(data, dataHandler)
+
+            internalData.objInstantiationTimestamp = new Date()
+
+            const dataHandler = {
+                get: function(internalDataInp, sPropName, receiver) {
+
+                }, // end of get
+                set: function(internalDataInp, sPropName, vNewValue) {
+
+                } // end of set
+            } // end of dataHandler()
+
+            return dataObj
+        } catch(err) {
+            console.dir(err)
+            debugger 
+        } // end of try/catch
+    } // end of createDataObj() 
+
+
 
 
 // ***🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒🍒
@@ -1796,6 +1841,20 @@ function OrvCore(optParams) {
         
     } // end of toggleVarListItm()
 
+
+    /*
+       CALL SOME GENERAL INITIALIZATION/CHECKING ROUTINES...
+
+       (actually done here at the Bottom of this file to account for slow loading)
+     */
+    getAnyCodePenInfo()
+
+    if (sCodePenId === "") {
+        getLocalAppName()
+    } // end if
+    
+    // probably does not make sense in this case...
+    orvCore.completelyLoaded = true; // this library is now completely loaded!
 } // end of OrvCore Constructor
 
 const orvCore = new OrvCore()

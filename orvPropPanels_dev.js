@@ -1174,6 +1174,19 @@ function OrvProps(siContainerId) {
 
                                     updatePropValueDisplayForPropsNamed(sObjPropName, vNewValue)
 
+                                    // right now, breaking DRY... oh well!! 🙄
+                                    if (typeof fnOnCommit === "function") {
+                                        const evtObj = {}
+                                        evtObj.event = "commit"
+                                        evtObj.timestamp = new Date()
+                                        evtObj.oldValue = vOldValue
+                                        evtObj.newValue = vNewValue
+                                        evtObj.additionalObj = additionalObj
+                                        evtObj.propObj = prop;  // the Property object involved
+                                        evtObj.propsObj = prop.propsObj // the object that the property belongs to
+                                        fnOnCommit(evtObj)
+                                    } // end if
+
                                     runChangeEventHandlers(prop, vOldValue, vNewValue, "valueSetOnPropObj");
                                     runPropLevelChangeEventHandlers(vOldValue, vNewValue, "valueSetOnPropObj")
                                 } // end if
